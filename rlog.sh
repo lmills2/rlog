@@ -1,7 +1,7 @@
 #!/bin/bash
 ## ------------------
 ## rlog Kx Surveillance log reading utility
-	VER="v1.0.1"
+	VER="v1.0.2"
 ## ------------------
 
 ASSET_CLASS="def"
@@ -130,7 +130,16 @@ if [ "$tomcat_flag" == 'true' ]; then
 else
 	LOGDIR="${SCRIPT_DIR}/../../delta-data/DeltaControlData/logdir"
 fi
-LOG="${BASH_ARGV[0]}"
+INP="${BASH_ARGV[0]}"
+wordRegex='(^.+?)(?=[0-9]+$|$)'
+numRegex='[0-9]+$'
+LOG=$(echo $INP | grep -oP $wordRegex)
+NUM=$(echo $INP | grep -oP $numRegex)
+FOUND_NUM='true'
+if [ -z "$NUM" ]; then
+	NUM='1'
+	FOUND_NUM='false'
+fi
 
 case "$LOG" in
 	"delta")	RES="DeltaControl\.*log*" ;;
@@ -140,38 +149,27 @@ case "$LOG" in
 	"rte")		RES="${REGION}_rte_core_transactionData_${ASSET_CLASS}_0_a*.log*" ;;
 	"pdb")		RES="${REGION}_pdb_core_transactionData_${ASSET_CLASS}_0_a.1*.log*" ;;
 	"ctp")		RES="${REGION}_ctp_core_transactionData_${ASSET_CLASS}_0_a*.log*" ;;
-	"hdb")		RES="${REGION}_hdb_core_transactionData_${ASSET_CLASS}_0_a*.log*" ;;
-	"hdb2")		RES="${REGION}_hdb_core_transactionData_${ASSET_CLASS}_1_a*.log*" ;;
-	"hdb3")		RES="${REGION}_hdb_core_transactionData_${ASSET_CLASS}_2_a*.log*" ;;
+	"hdb")		if [ "$FOUND_NUM" == 'false' ]; then NUM='0'; fi
+			RES="${REGION}_hdb_core_transactionData_${ASSET_CLASS}_${NUM}_a*.log*" ;;
 	"master")	RES="surv_master_a*.log*" ;;
 	"at")		RES="surv_at_a*.log*" ;;
 	"gwat")		RES="surv_gw_at_a*.log*" ;;
-	"qrgw1")	RES="qr_gw_surv_entrypoint_1_a_1*.log*" ;;
-	"qrgw2")	RES="qr_gw_surv_entrypoint_1_a_2*.log*" ;;
-	"qrgw3")	RES="qr_gw_surv_entrypoint_1_a_3*.log*" ;;
+	"qrgw")		RES="qr_gw_surv_entrypoint_1_a_${NUM}*.log*" ;;
 	"qr")		RES="emea_qr_surv_entrypoint_1_a_1*.log*" ;;
 	"gw")		RES="emea_gw_0_a*.log*" ;;
 	"qm")		RES="emea_qm_0_a*.log*" ;;
 	"rman")		RES="surv_manager_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"reng2")	RES="surv_engine_realtime_${ASSET_CLASS}_1_a_2*.log*" ;;
-	"reng3")	RES="surv_engine_realtime_${ASSET_CLASS}_1_a_3*.log*" ;;
-	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"rhdb2")	RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_2*.log*" ;;
+	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
+	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
 	"rtp")		RES="surv_tp_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"rppe")		RES="surv_preprocessing_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"wman")         RES="surv_manager_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
-        "weng")         RES="surv_engine_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
-        "weng2")        RES="surv_engine_replay_${ASSET_CLASS}_1_a_2*.log*" ;;
-        "weng3")        RES="surv_engine_replay_${ASSET_CLASS}_1_a_3*.log*" ;;
-        "whdb")         RES="surv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
-        "whdb2")        RES="surv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_2*.log*" ;;
+        "weng")         RES="surv_engine_replay_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
+        "whdb")         RES="surv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
 	"wppe")         RES="surv_preprocessing_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"wreplay")	RES="surv_replay_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"disp")		RES="surv_dl_dispatcher_a*.log*" ;;
-	"dl1")		RES="surv_dl_1_a*.log*" ;;
-	"dl2")		RES="surv_dl_2_a*.log*" ;;
-	"dl3")		RES="surv_dl_3_a*.log*" ;;
+	"dl")		RES="surv_dl_${NUM}_a*.log*" ;;
 	"mvf")		RES="surv_dl_moveFiles_a*.log*" ;;
 	"ogf")		RES="surv_dl_outgoingFiles_a*.log*" ;;
 	"derror")	RES="deltaError.log*" ;;
@@ -183,6 +181,8 @@ case "$LOG" in
 	"streaming")	RES="streaming.log*" ;;
 	*)		RES="$LOG*.log*" ;;
 esac
+
+echo "Opening log -- ${RES}"
 
 if [ "$tail_flag" == 'true' ]; then
 	find $LOGDIR -type f -name "$RES" -printf '%T+ %p\n' | sort -r | head -n1 | cut -d ' ' -f2 - | xargs tail -f
