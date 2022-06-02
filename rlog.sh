@@ -1,9 +1,13 @@
 #!/bin/bash
-## ------------------
+#### ------------------
 ## rlog Kx Surveillance log reading utility
-	VER="v1.0.2"
-## ------------------
+VER="v1.0.3"
+#### ------------------
+# This script uses the directory it is started from to find the environment to read, and
+# assumes it is in the delta-bin/bin directory. It won't run from a different directory.
+#### ------------------
 
+## The default asset class and region to use
 ASSET_CLASS="def"
 REGION="global"
 
@@ -12,7 +16,16 @@ print_usage() {
 		rlog - Kx Surveillance log reading utility
 ============================================================================
 
-Usage: Calls less on the latest log for the given process name. Either the full process name or the shortcuts listed below can be used.
+Utility for reading Kx Surveillance process logs. The default behaviour is to call less on the given log, however this can be
+modified using the optional flags. Either a full process name or a log-type shortcut can be used.
+Logs for processes with multiple clones can be viewed by adding the clone number to the end of the log type input. For example, 'reng2' will
+retrieve the log for realtime engine clone 2 -> surv_engine_realtime_${ASSET_CLASS}_1_a_2. If no number is given, the log for the first clone
+will be retrieved (0 or 1, process dependent).
+
+It is recommended to create an alias pointing to this script for ease of use.
+
+Example:\trlog hdb <-> will less the log for ${REGION}_hdb_core_transactionData_${ASSET_CLASS}_0_a
+\t\trlog -t master <-> will tail the log for surv_master_a
 
 Optional Flags:
 	- [-t] Calls tail -f on the latest log.
@@ -42,42 +55,35 @@ Global Stack:
 	- rte\t\t${REGION}_rte_core_transactionData_${ASSET_CLASS}_0_a
 	- pdb\t\t${REGION}_pdb_core_transactionData_${ASSET_CLASS}_0_a
 	- ctp\t\t${REGION}_ctp_core_transactionData_${ASSET_CLASS}_0_a
-	- hdb\t\t${REGION}_hdb_core_transactionData_${ASSET_CLASS}_0_a
-	- hdb2\t\t${REGION}_hdb_core_transactionData_${ASSET_CLASS}_2_a
-	- hdb3\t\t${REGION}_hdb_core_transactionData_${ASSET_CLASS}_3_a
+	- hdb(n)\t${REGION}_hdb_core_transactionData_${ASSET_CLASS}_(n)_a
 
 Core:
 	- master\tsurv_master_a
 	- at\t\tsurv_at_a
 	- gwat\t\tsurv_gw_at_a
-	- qrgw1-3\tqr_gw_surv_entrypoint_1_a_1-3
+	- qrgw(n)\tqr_gw_surv_entrypoint_1_a_(n)
 	- qr\t\temea_qr_surv_entrypoint_1_a_1
 	- gw\t\temea_gw_0_a
 	- qm\t\temea_qm_0_a
+	- udf\t\temea_udf_0_a
 
 Realtime WF:
 	- rman\t\tsurv_manager_realtime_${ASSET_CLASS}_1_a_1
-	- reng\t\tsurv_engine_realtime_${ASSET_CLASS}_1_a_1
-	- reng2\t\tsurv_engine_realtime_${ASSET_CLASS}_1_a_2
-	- reng3\t\tsurv_engine_realtime_${ASSET_CLASS}_1_a_3
-	- rhdb\t\tsurv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_1
-	- rhdb2\t\tsurv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_2
+	- reng(n)\tsurv_engine_realtime_${ASSET_CLASS}_1_a_(n)
+	- rhdb(n)\tsurv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_(n)
 	- rtp\t\tsurv_tp_realtime_${ASSET_CLASS}_1_a_1
 	- rppe\t\tsurv_preprocessing_realtime_${ASSET_CLASS}_1_a_1
 
 Replay WF 1:
         - wman\t\tsurv_manager_replay_${ASSET_CLASS}_1_a_1
-        - weng\t\tsurv_engine_replay_${ASSET_CLASS}_1_a_1
-        - weng2\t\tsurv_engine_replay_${ASSET_CLASS}_1_a_2
-        - weng3\t\tsurv_engine_replay_${ASSET_CLASS}_1_a_3
-        - whdb\t\tsurv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_1
-        - whdb2\t\tsurv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_2
+        - weng(n)\tsurv_engine_replay_${ASSET_CLASS}_1_a_(n)
+        - whdb(n)\tsurv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_(n)
         - wppe\t\tsurv_preprocessing_replay_${ASSET_CLASS}_1_a_1
 	- wreplay\tsurv_replay_replay_1_a_1
 
 Dataloader:
 	- disp\t\tsurv_dl_dispatcher_a
-	- dl1-3\t\tsurv_dl_(1-3)_a
+	- dl(n)\t\tsurv_dl_(n)_a
 	- mvf\t\tsurv_dl_moveFiles_a
 	- ogf\t\tsurv_dl_outgoingFiles_a
 
@@ -94,6 +100,7 @@ rlog ${VER}
 "
 }
 
+## Assumes we are in delta-data/bin
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
 
 if [ ! "$1" ]; then
