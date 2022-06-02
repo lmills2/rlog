@@ -1,7 +1,7 @@
 #!/bin/bash
 #### ------------------
 ## rlog Kx Surveillance log reading utility
-VER="v1.0.4"
+VER="v1.0.5"
 #### ------------------
 # This script uses the directory it is started from to find the environment to read, and
 # assumes it is in the delta-bin/bin directory. It won't run from a different directory.
@@ -66,6 +66,13 @@ Core:
 	- gw\t\temea_gw_0_a
 	- qm\t\temea_qm_0_a
 	- udf\t\temea_udf_0_a
+
+Ops:
+	- ogw\t\tds_gw_ops_a
+	- ohdb\t\tds_hdb_ops_a
+	- oqm\t\tds_qm_ops_a
+	- ordb\t\tds_rdb_ops_a
+	- orte\t\tds_rte_ops_a
 
 Realtime WF:
 	- rman\t\tsurv_manager_realtime_${ASSET_CLASS}_1_a_1
@@ -166,6 +173,11 @@ case "$LOG" in
 	"gw")		RES="emea_gw_0_a*.log*" ;;
 	"qm")		RES="emea_qm_0_a*.log*" ;;
 	"udf")		RES="emea_udf_0_a*.log*" ;;
+	"ogw")		RES="ds_gw_ops_a*.log*" ;;
+	"ohdb")		RES="ds_hdb_ops_a*.log*" ;;
+	"oqm")		RES="ds_qm_ops_a*.log*" ;;
+	"ordb")		RES="ds_rdb_ops_a*.log*" ;;
+	"orte")		RES="ds_rte_ops_a*.log*" ;;
 	"rman")		RES="surv_manager_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
 	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
