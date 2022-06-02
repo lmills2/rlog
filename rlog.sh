@@ -1,7 +1,7 @@
 #!/bin/bash
 #### ------------------
 ## rlog Kx Surveillance log reading utility
-VER="v1.0.5"
+VER="v1.0.6"
 #### ------------------
 # This script uses the directory it is started from to find the environment to read, and
 # assumes it is in the delta-bin/bin directory. It won't run from a different directory.
@@ -73,6 +73,7 @@ Ops:
 	- oqm\t\tds_qm_ops_a
 	- ordb\t\tds_rdb_ops_a
 	- orte\t\tds_rte_ops_a
+	- otp\t\tds_tp_ops_a
 
 Realtime WF:
 	- rman\t\tsurv_manager_realtime_${ASSET_CLASS}_1_a_1
@@ -178,6 +179,7 @@ case "$LOG" in
 	"oqm")		RES="ds_qm_ops_a*.log*" ;;
 	"ordb")		RES="ds_rdb_ops_a*.log*" ;;
 	"orte")		RES="ds_rte_ops_a*.log*" ;;
+	"otp")		RES="ds_tp_ops_a*.log*" ;;
 	"rman")		RES="surv_manager_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
 	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
 	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
