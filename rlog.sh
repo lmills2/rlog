@@ -1,7 +1,7 @@
 #!/bin/bash
 #### ------------------
 ## rlog Kx Surveillance log reading utility
-VER="v1.0.6"
+VER="v1.0.7"
 #### ------------------
 # This script uses the directory it is started from to find the environment to read, and
 # assumes it is in the delta-bin/bin directory. It won't run from a different directory.
@@ -10,6 +10,7 @@ VER="v1.0.6"
 ## The default asset class and region to use
 ASSET_CLASS="def"
 REGION="global"
+WF="1"
 
 print_usage() {
 	printf "============================================================================
@@ -35,6 +36,7 @@ Optional Flags:
 	- [-f] Finds the given phrase in the latest log. (Phrase must not be separated by white space from option).
 	- [-a] Set the asset class to use for looking for logs. Default is '${ASSET_CLASS}'.
 	- [-r] Set the region to use for looking for logs. Default is '${REGION}'.
+	- [-w] Set the WF Clone to look for. Default is '${WF}'.
 	- [-d] Options for Tomcat logs.
 	- [-h] Help.
 	
@@ -123,7 +125,7 @@ tomcat_flag='false'
 
 ENV="dev"
 grep_str=" "
-while getopts 'tshledf::a::r::' flag; do
+while getopts 'tshledf::a::r::w::' flag; do
         case "${flag}" in
                 t) tail_flag='true' ;;
 		s) ENV="stage" ;;
@@ -135,6 +137,7 @@ while getopts 'tshledf::a::r::' flag; do
 		d) tomcat_flag='true' ;;
 		a) ASSET_CLASS="${OPTARG}" ;;
 		r) REGION="${OPTARG}" ;;
+		w) WF="${OPTARG}" ;;
 		f) grep_flag='true'
 		   grep_str="${OPTARG}" ;;
         esac
@@ -169,8 +172,8 @@ case "$LOG" in
 	"master")	RES="surv_master_a*.log*" ;;
 	"at")		RES="surv_at_a*.log*" ;;
 	"gwat")		RES="surv_gw_at_a*.log*" ;;
-	"qrgw")		RES="qr_gw_surv_entrypoint_1_a_${NUM}*.log*" ;;
-	"qr")		RES="emea_qr_surv_entrypoint_1_a_1*.log*" ;;
+	"qrgw")		RES="qr_gw_surv_entrypoint_${WF}_a_${NUM}*.log*" ;;
+	"qr")		RES="emea_qr_surv_entrypoint_${WF}_a_${NUM}*.log*" ;;
 	"gw")		RES="emea_gw_0_a*.log*" ;;
 	"qm")		RES="emea_qm_0_a*.log*" ;;
 	"udf")		RES="emea_udf_0_a*.log*" ;;
@@ -180,16 +183,16 @@ case "$LOG" in
 	"ordb")		RES="ds_rdb_ops_a*.log*" ;;
 	"orte")		RES="ds_rte_ops_a*.log*" ;;
 	"otp")		RES="ds_tp_ops_a*.log*" ;;
-	"rman")		RES="surv_manager_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
-	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
-	"rtp")		RES="surv_tp_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"rppe")		RES="surv_preprocessing_realtime_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"wman")         RES="surv_manager_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
-        "weng")         RES="surv_engine_replay_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
-        "whdb")         RES="surv_hdb_benchmark_replay_${ASSET_CLASS}_1_a_${NUM}*.log*" ;;
-	"wppe")         RES="surv_preprocessing_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
-	"wreplay")	RES="surv_replay_replay_${ASSET_CLASS}_1_a_1*.log*" ;;
+	"rman")		RES="surv_manager_realtime_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"reng")		RES="surv_engine_realtime_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"rhdb")		RES="surv_hdb_benchmark_realtime_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"rtp")		RES="surv_tp_realtime_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"rppe")		RES="surv_preprocessing_realtime_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"wman")         RES="surv_manager_replay_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+        "weng")         RES="surv_engine_replay_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+        "whdb")         RES="surv_hdb_benchmark_replay_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"wppe")         RES="surv_preprocessing_replay_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
+	"wreplay")	RES="surv_replay_replay_${ASSET_CLASS}_${WF}_a_${NUM}*.log*" ;;
 	"disp")		RES="surv_dl_dispatcher_a*.log*" ;;
 	"dl")		RES="surv_dl_${NUM}_a*.log*" ;;
 	"mvf")		RES="surv_dl_moveFiles_a*.log*" ;;
