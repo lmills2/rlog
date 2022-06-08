@@ -1,7 +1,7 @@
 #!/bin/bash
 #### ------------------
 ## rlog Kx Surveillance log reading utility
-VER="v1.0.7"
+VER="v1.0.8"
 #### ------------------
 # This script uses the directory it is started from to find the environment to read, and
 # assumes it is in the delta-bin/bin directory. It won't run from a different directory.
@@ -68,6 +68,7 @@ Core:
 	- gw\t\temea_gw_0_a
 	- qm\t\temea_qm_0_a
 	- udf\t\temea_udf_0_a
+	- ebus\t\tdaas_eventBus_a
 
 Ops:
 	- ogw\t\tds_gw_ops_a
@@ -177,6 +178,7 @@ case "$LOG" in
 	"gw")		RES="emea_gw_0_a*.log*" ;;
 	"qm")		RES="emea_qm_0_a*.log*" ;;
 	"udf")		RES="emea_udf_0_a*.log*" ;;
+	"ebus")		RES="daas_eventBus_a*.log*" ;;
 	"ogw")		RES="ds_gw_ops_a*.log*" ;;
 	"ohdb")		RES="ds_hdb_ops_a*.log*" ;;
 	"oqm")		RES="ds_qm_ops_a*.log*" ;;
